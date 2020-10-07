@@ -7,7 +7,7 @@ app = Flask(__name__)
 CORS(app)
 api = Api(app)
 api.add_resource(Projects, "/")
-api.add_resource(Project, "/project/<string:title>")
+api.add_resource(Project, "/project")
 
 if __name__ == "__main__":
     app.run()

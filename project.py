@@ -1,3 +1,4 @@
+from flask import request
 from flask_restful import Api, Resource, reqparse
 import json
 
@@ -9,44 +10,49 @@ class Projects(Resource):
         return projects, 200
 
 class Project(Resource):
-    def get(self, title):
+    def get(self):
+        id = request.args.get('id')
+        print(id)
         for project in projects:
-            if(title == project["title"]):
+            if(id == project["id"]):
                 return project, 200
         return "Project not found", 404
 
-    def post(self, title):
+    def post(self):
         parser = reqparse.RequestParser()
+        parser.add_argument("title")
         parser.add_argument("body")
         parser.add_argument("image")
         args = parser.parse_args()
 
         for project in projects:
-            if(title == project["title"]):
-                return "Project with title {} already exists".format(title), 400
+            if(id == project["id"]):
+                return "Project with title {} already exists".format(id), 400
             
         project = {
-            "title": title,
+            "title": args["title"],
             "body": args["body"],
             "image": args["image"]
         }
         projects.append(project)
         return project, 201
 
-    def put(self, title):
+    def put(self):
         parser = reqparse.RequestParser()
+        parser.add_argument("title")
         parser.add_argument("body")
         parser.add_argument("image")
         args = parser.parse_args()
 
         for project in projects:
-            if(title == project["title"]):
+            if(id == project["id"]):
+                project["title"] = args["title"]
                 project["body"] = args["body"]
                 project["image"] = args["image"]
                 return project, 200
             
         project = {
-            "title": title,
+            "title": args["title"],
             "body": args["body"],
             "image": args["image"]
         }
@@ -54,7 +60,7 @@ class Project(Resource):
         return project, 201
 
 
-    def delete(self, title):
+    def delete(self):
         global projects
-        projects = [project for project in projects if project["title"] != title]
-        return "{} is deleted.".format(title), 200
+        projects = [project for project in projects if project["id"] != id]
+        return "{} is deleted.".format(id), 200
