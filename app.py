@@ -7,4 +7,5 @@ api = Api(app)
 api.add_resource(Projects, "/")
 api.add_resource(Project, "/project/<string:title>")
 
-app.run(debug=True)
+if __name__ == "__main__":
+    app.run()
