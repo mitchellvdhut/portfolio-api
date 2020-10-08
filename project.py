@@ -1,6 +1,11 @@
 from flask import request
 from flask_restful import Api, Resource, reqparse
+from pymongo import MongoClient
 import json
+
+# client = MongoClient("mongodb+srv://vdhut:krtipyi7@cluster0-u7wcw.azure.mongodb.net/portfolio?retryWrites=true&w=majority")
+client = MongoClient("mongodb+srv://vdhut:krtipyi7@cluster0-u7wcw.azure.mongodb.net/portfolio?retryWrites=true&w=majority")
+db=client.portfolio
 
 f = open('projects.json',)
 projects = json.load(f) 
@@ -20,40 +25,41 @@ class Project(Resource):
 
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument("title")
-        parser.add_argument("body")
+        parser.add_argument("title", required=True, help='Project title is required')
+        parser.add_argument("description", required=True, help='Project description is required')
         parser.add_argument("image")
         args = parser.parse_args()
 
-        for project in projects:
-            if(id == project["id"]):
-                return "Project with title {} already exists".format(id), 400
-            
+        title = args["title"]
+        
         project = {
             "title": args["title"],
-            "body": args["body"],
+            "description": args["description"],
             "image": args["image"]
         }
-        projects.append(project)
-        return project, 201
+        
+        result=db.projects.insert_one(project)
+        
+        print('Created project {0} with id: {1}'.format(title,result.inserted_id))
+        return 201
 
     def put(self):
         parser = reqparse.RequestParser()
         parser.add_argument("title")
-        parser.add_argument("body")
+        parser.add_argument("description")
         parser.add_argument("image")
         args = parser.parse_args()
 
         for project in projects:
             if(id == project["id"]):
                 project["title"] = args["title"]
-                project["body"] = args["body"]
+                project["description"] = args["description"]
                 project["image"] = args["image"]
                 return project, 200
             
         project = {
             "title": args["title"],
-            "body": args["body"],
+            "description": args["description"],
             "image": args["image"]
         }
         projects.append(project)
