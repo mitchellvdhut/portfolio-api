@@ -1,18 +1,20 @@
 from flask import request
 from flask_restful import Api, Resource, reqparse
 from pymongo import MongoClient
+from bson import json_util, ObjectId
 import json
 
 # client = MongoClient("mongodb+srv://vdhut:krtipyi7@cluster0-u7wcw.azure.mongodb.net/portfolio?retryWrites=true&w=majority")
 client = MongoClient("mongodb+srv://vdhut:krtipyi7@cluster0-u7wcw.azure.mongodb.net/portfolio?retryWrites=true&w=majority")
 db=client.portfolio
 
-f = open('projects.json',)
-projects = json.load(f) 
+projects = db.projects
 
 class Projects(Resource):
     def get(self):
-        return projects, 200
+        
+        foo = json.loads(json_util.dumps(projects.find()))
+        return foo, 200
 
 class Project(Resource):
     def get(self):
@@ -31,7 +33,7 @@ class Project(Resource):
         args = parser.parse_args()
 
         title = args["title"]
-        
+
         project = {
             "title": args["title"],
             "description": args["description"],
