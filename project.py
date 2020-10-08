@@ -6,7 +6,6 @@ import json, os
 
 DB_USER=os.getenv("DB_USER")
 DB_PASSWORD=os.getenv("DB_PASSWORD")
-print(DB_USER, DB_PASSWORD)
 
 client = MongoClient(f"mongodb+srv://{DB_USER}:{DB_PASSWORD}@cluster0-u7wcw.azure.mongodb.net/portfolio?retryWrites=true&w=majority")
 db=client.portfolio
