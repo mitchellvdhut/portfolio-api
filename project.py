@@ -2,10 +2,13 @@ from flask import request
 from flask_restful import Api, Resource, reqparse
 from pymongo import MongoClient
 from bson import json_util, ObjectId
-import json
+import json, os
 
-# client = MongoClient("mongodb+srv://vdhut:krtipyi7@cluster0-u7wcw.azure.mongodb.net/portfolio?retryWrites=true&w=majority")
-client = MongoClient("mongodb+srv://vdhut:krtipyi7@cluster0-u7wcw.azure.mongodb.net/portfolio?retryWrites=true&w=majority")
+DB_USER=os.getenv("DB_USER")
+DB_PASSWORD=os.getenv("DB_PASSWORD")
+print(DB_USER, DB_PASSWORD)
+
+client = MongoClient(f"mongodb+srv://{DB_USER}:{DB_PASSWORD}@cluster0-u7wcw.azure.mongodb.net/portfolio?retryWrites=true&w=majority")
 db=client.portfolio
 
 projects = db.projects
@@ -47,8 +50,8 @@ class Project(Resource):
 
     def put(self):
         parser = reqparse.RequestParser()
-        parser.add_argument("title")
-        parser.add_argument("description")
+        parser.add_argument("title", required=True, help='Project title is required')
+        parser.add_argument("description", required=True, help='Project description is required')
         parser.add_argument("image")
         args = parser.parse_args()
 
