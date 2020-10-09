@@ -22,7 +22,7 @@ class Project(Resource):
     def get(self):
         projectid = request.args.get('projectid')
         try:
-            result = json.loads(json_util.dumps(projects.find_one({"_id": ObjectId(projectid)})))
+            result = json.loads(json_util.dumps(projects.find({"_id": ObjectId(projectid)})))
         except Exception as e:
             return json_util.dumps(str(e)), 500
         return result, 200
