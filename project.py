@@ -72,5 +72,7 @@ class Project(Resource):
         parser.add_argument("projectid", required=True, help='Project id is required')
         args = parser.parse_args()
 
+        projectid = args["projectid"]
+
         db.projects.delete_one({"_id": ObjectId(projectid)})
-        return "{} is deleted.".format(id), 200
+        return "Post with id: {} is deleted.".format(projectid), 200
