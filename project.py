@@ -68,6 +68,9 @@ class Project(Resource):
 
 
     def delete(self):
-        global projects
-        projects = [project for project in projects if project["id"] != id]
+        parser = reqparse.RequestParser()
+        parser.add_argument("projectid", required=True, help='Project id is required')
+        args = parser.parse_args()
+
+        db.projects.delete_one({"_id": ObjectId(projectid)})
         return "{} is deleted.".format(id), 200
