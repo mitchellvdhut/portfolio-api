@@ -15,17 +15,14 @@ projects = db.projects
 class Projects(Resource):
     def get(self):
         
-        foo = json.loads(json_util.dumps(projects.find()))
-        return foo, 200
+        result = json.loads(json_util.dumps(projects.find()))
+        return result, 200
 
 class Project(Resource):
     def get(self):
-        id = request.args.get('id')
-        print(id)
-        for project in projects:
-            if(id == project["id"]):
-                return project, 200
-        return "Project not found", 404
+        projectid = request.args.get('projectid')
+        result = json.loads(json_util.dumps(projects.find_one({"_id": ObjectId(projectid)})))
+        return result, 200
 
     def post(self):
         parser = reqparse.RequestParser()
@@ -49,25 +46,25 @@ class Project(Resource):
 
     def put(self):
         parser = reqparse.RequestParser()
+        parser.add_argument("projectid", required=True, help='Project id is required')
         parser.add_argument("title", required=True, help='Project title is required')
         parser.add_argument("description", required=True, help='Project description is required')
         parser.add_argument("image")
         args = parser.parse_args()
 
-        for project in projects:
-            if(id == project["id"]):
-                project["title"] = args["title"]
-                project["description"] = args["description"]
-                project["image"] = args["image"]
-                return project, 200
-            
-        project = {
+        projectid = args["projectid"]
+        filter = {"_id": ObjectId(projectid)}
+        project = { "$set": {
             "title": args["title"],
             "description": args["description"],
             "image": args["image"]
-        }
-        projects.append(project)
-        return project, 201
+        }}
+
+        
+        db.projects.update_one(filter, project)
+        
+        print('Edited project with id: {0}'.format(projectid))
+        return 201
 
 
     def delete(self):
