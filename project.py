@@ -21,10 +21,10 @@ class Projects(Resource):
 class Project(Resource):
     def get(self):
         projectid = request.args.get('projectid')
-        foo = projects.find_one({"_id": ObjectId(projectid)})
-        bar = json_util.dumps(foo)
-        result = json.loads(json_util.dumps(projects.find_one({"_id": ObjectId(projectid)})))
-        print('foo:', foo,'bar:', bar,'result:', result)
+        try:
+            result = json.loads(json_util.dumps(projects.find_one({"_id": ObjectId(projectid)})))
+        except Exception as e:
+            return json_util.dumps(str(e)), 500
         return result, 200
 
     def post(self):
