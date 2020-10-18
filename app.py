@@ -1,13 +1,15 @@
+from dotenv import load_dotenv
 from flask import Flask
-from flask_restful import Api, Resource, reqparse
-from flask_cors import CORS
-from project import Project, Projects
+from project import get_projects
 
+load_dotenv('.env')
 app = Flask(__name__)
-CORS(app)
-api = Api(app)
-api.add_resource(Projects, "/")
-api.add_resource(Project, "/project")
+app.config.from_pyfile('settings.py')
 
-if __name__ == "__main__":
-    app.run()
+
+@app.route('/projects/')
+def get_all_projects():
+    return get_projects(app)
+
+
+app.run()

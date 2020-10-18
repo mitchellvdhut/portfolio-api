@@ -1,81 +1,20 @@
-from flask import request
-from flask_restful import Api, Resource, reqparse
 from pymongo import MongoClient
-from bson import json_util, ObjectId
-import json, os
-
-DB_USER=os.getenv("DB_USER")
-DB_PASSWORD=os.getenv("DB_PASSWORD")
-
-client = MongoClient(f"mongodb+srv://{DB_USER}:{DB_PASSWORD}@cluster0-u7wcw.azure.mongodb.net/portfolio?retryWrites=true&w=majority")
-db=client.portfolio
-
-projects = db.projects
-
-class Projects(Resource):
-    def get(self):
-        
-        result = json.loads(json_util.dumps(projects.find()))
-        return result, 200
-
-class Project(Resource):
-    def get(self):
-        projectid = request.args.get('projectid')
-        try:
-            result = json.loads(json_util.dumps(projects.find({"_id": ObjectId(projectid)})))
-        except Exception as e:
-            return json_util.dumps(str(e)), 500
-        return result, 200
-
-    def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument("title", required=True, help='Project title is required')
-        parser.add_argument("description", required=True, help='Project description is required')
-        parser.add_argument("image")
-        args = parser.parse_args()
-
-        title = args["title"]
-
-        project = {
-            "title": args["title"],
-            "description": args["description"],
-            "image": args["image"]
-        }
-        
-        result=db.projects.insert_one(project)
-        
-        print('Created project {0} with id: {1}'.format(title,result.inserted_id))
-        return 201
-
-    def put(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument("projectid", required=True, help='Project id is required')
-        parser.add_argument("title", required=True, help='Project title is required')
-        parser.add_argument("description", required=True, help='Project description is required')
-        parser.add_argument("image")
-        args = parser.parse_args()
-
-        projectid = args["projectid"]
-        filter = {"_id": ObjectId(projectid)}
-        project = { "$set": {
-            "title": args["title"],
-            "description": args["description"],
-            "image": args["image"]
-        }}
-
-        
-        db.projects.update_one(filter, project)
-        
-        print('Edited project with id: {0}'.format(projectid))
-        return 201
+from flask import jsonify
+from bson import json_util
+import json
 
 
-    def delete(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument("projectid", required=True, help='Project id is required')
-        args = parser.parse_args()
+def get_database(app):
+    user = app.config.get("DB_USER")
+    pw = app.config.get("DB_PASSWORD")
+    client = MongoClient(
+        f"mongodb+srv://{user}:{pw}@cluster0-u7wcw.azure.mongodb.net/portfolio?retryWrites=true&w=majority")
+    db = client.portfolio
+    return db.projects
 
-        projectid = args["projectid"]
 
-        db.projects.delete_one({"_id": ObjectId(projectid)})
-        return "Post with id: {} is deleted.".format(projectid), 200
+def get_projects(app):
+    projects = get_database(app)
+    result = json.loads(json_util.dumps(projects.find()))
+    return jsonify(result)
+
