@@ -11,7 +11,7 @@ def get_database(app):
     client = MongoClient(
         f"mongodb+srv://{user}:{pw}@cluster0-u7wcw.azure.mongodb.net/portfolio?retryWrites=true&w=majority")
     db = client.portfolio
-    return db.testing
+    return db.projects
 
 def get_projects(app, projects):
     result = json.loads(json_util.dumps(projects.find()))
