@@ -3,6 +3,7 @@ from flask import Flask, request
 from flask_cors import CORS
 from project import get_projects, get_database, get_project, post_project, put_project, delete_project
 from inbox import get_messages, get_messageDB, get_message, post_message, put_message, delete_message
+from blog import get_posts, get_postDB, get_post, post_post, put_post, delete_post
 import sys, os
 
 if len(sys.argv) > 1:
@@ -19,6 +20,7 @@ CORS(app)
 
 projects = get_database(app)
 messages = get_messageDB(app)
+posts = get_postDB(app)
 
 @app.route('/projects/', methods=['GET'])
 def get_all_projects():
@@ -36,21 +38,37 @@ def project():
         return delete_project(projects)
     return 'Invalid request'
 
-# @app.route('/inbox/')
-# def get_all_messages():
-#     return get_messages(app, messages)
+@app.route('/inbox/')
+def get_all_messages():
+    return get_messages(app, messages)
 
-# @app.route('/inbox/message', methods=['GET', 'POST', 'PUT', 'DELETE'])
-# def message():
-#     if (request.method == 'GET'):
-#         return get_message(messages)
-#     if (request.method == 'POST'):
-#         return post_message(messages)
-#     if (request.method == 'PUT'):
-#         return put_message(messages)
-#     if (request.method == 'DELETE'):
-#         return delete_message(messages)
-#     return 'Invalid request'
+@app.route('/inbox/message', methods=['GET', 'POST', 'PUT', 'DELETE'])
+def message():
+    if (request.method == 'GET'):
+        return get_message(messages)
+    if (request.method == 'POST'):
+        return post_message(messages)
+    if (request.method == 'PUT'):
+        return put_message(messages)
+    if (request.method == 'DELETE'):
+        return delete_message(messages)
+    return 'Invalid request'
+
+@app.route('/blog/', methods=['GET'])
+def get_all_posts():
+    return get_posts(app, posts)
+
+@app.route('/post', methods=['GET', 'POST', 'PUT', 'DELETE'])
+def post():
+    if (request.method == 'GET'):
+        return get_post(posts)
+    if (request.method == 'POST'):
+        return post_post(posts)
+    if (request.method == 'PUT'):
+        return put_post(posts)
+    if (request.method == 'DELETE'):
+        return delete_post(posts)
+    return 'Invalid request'
 
 
 print(os.environ.get('FLASK_ENV'))
